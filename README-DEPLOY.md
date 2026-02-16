@@ -1,32 +1,32 @@
-# RoomSync - 2-Step Deployment Guide (Easiest Method)
+# RoomSync - Render + Vercel Deployment Guide
 
-I have fixed the code so you can deploy your project in two simple parts.
+Since Render is working for your backend, here are the steps to finalize everything and get the frontend live on Vercel.
 
-## Part 1: Backend & Database (on Railway)
-1. Go to **[Railway.app](https://railway.app/)**.
-2. Create a **New Project** → **GitHub Repo** → Select `RoomSyncc`.
-3. Railway will now find the `Dockerfile` I added and build your **Backend**.
-4. **Add Database**: 
-   - Click **"New"** → **"Database"** → **"Add PostgreSQL"**.
-   - Railway will automatically connect it.
-5. **Add Environment Variables**:
-   - Click on the **backend/service** → **Variables**.
-   - Add `SECRET_KEY` = (any random text).
-   - Add `DEBUG` = `False`.
+## Part 1: Finalize Render (Backend)
+1. Ensure your **Render Web Service** is connected to your GitHub repo.
+2. In Render, go to **Environment** and ensure these are set:
+   - `SECRET_KEY` = (any random string)
+   - `DEBUG` = `False`
+   - `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` (Get these from your Render PostgreSQL instance).
+3. **Copy your Render URL**: It will look like `https://roomsync-backend.onrender.com`.
 
-## Part 2: Frontend (on Vercel)
+## Part 2: Deploy Frontend (Vercel)
 1. Go to **[Vercel.com](https://vercel.com/)**.
 2. Click **"Add New"** → **"Project"** → Select `RoomSyncc`.
-3. **CRITICAL STEP**: On the "Import Project" screen, look for **"Root Directory"**.
-4. Click **"Edit"** and select the `frontend` folder.
-5. **Add API URL**:
-   - Under **"Environment Variables"**, add:
-     - `REACT_APP_API_URL` = (The URL Railway gave you for the backend).
-6. Click **"Deploy"**.
+3. **Root Directory**: Click "Edit" and select the **`frontend`** folder.
+4. **Environment Variables**: Add one variable:
+   - **Key**: `REACT_APP_API_URL`
+   - **Value**: (Your Render Backend URL from Part 1)
+5. Click **"Deploy"**.
+
+## Part 3: Final Security (CORS)
+Once Vercel gives you a link (e.g., `https://roomsync-frontend.vercel.app`):
+1. Go back to your **Render Backend** settings.
+2. In the **Environment** variables, add:
+   - `CORS_ALLOWED_ORIGINS` = `https://roomsync-frontend.vercel.app`
+   - `CSRF_TRUSTED_ORIGINS` = `https://roomsync-frontend.vercel.app`
+3. Save and let Render redeploy.
 
 ---
-
-### **Why this works?**
-- **Railway** is great for Python/Django and Databases.
-- **Vercel** is the fastest and easiest for React Frontends.
-- I've already updated the code to make sure they talk to each other correctly!
+### **Done!**
+Your app will now be fully functional with the frontend on Vercel talking to the backend on Render.
