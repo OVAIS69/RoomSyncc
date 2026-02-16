@@ -4,7 +4,7 @@ echo   RoomSync - Starting Backend Server
 echo ========================================
 echo.
 
-cd "c:\Users\Ovais\Downloads\RoomSync Frontend main\RoomSync Backend main\room_booking_system"
+cd "c:\Users\Ovais\Downloads\RoomSync Frontend main\backend\room_booking_system"
 
 echo Starting Django server on http://localhost:8000
 echo.

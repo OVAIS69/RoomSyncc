@@ -7,12 +7,12 @@ echo This will start both Backend and Frontend servers
 echo.
 
 echo Starting Backend Server...
-start "RoomSync Backend" cmd /k "cd /d "c:\Users\Ovais\Downloads\RoomSync Frontend main\RoomSync Backend main\room_booking_system" && python manage.py runserver"
+start "RoomSync Backend" cmd /k "cd /d "c:\Users\Ovais\Downloads\RoomSync Frontend main\backend\room_booking_system" && python manage.py runserver"
 
 timeout /t 3 /nobreak >nul
 
 echo Starting Frontend Server...
-start "RoomSync Frontend" cmd /k "cd /d "c:\Users\Ovais\Downloads\RoomSync Frontend main\RoomSync..-main" && (if not exist node_modules\ npm install) && npm start"
+start "RoomSync Frontend" cmd /k "cd /d "c:\Users\Ovais\Downloads\RoomSync Frontend main\frontend" && (if not exist node_modules\ npm install) && npm start"
 
 echo.
 echo ========================================

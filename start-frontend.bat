@@ -4,7 +4,7 @@ echo   RoomSync - Starting Frontend Server
 echo ========================================
 echo.
 
-cd "c:\Users\Ovais\Downloads\RoomSync Frontend main\RoomSync..-main"
+cd "c:\Users\Ovais\Downloads\RoomSync Frontend main\frontend"
 
 echo Checking for node_modules...
 if not exist "node_modules\" (

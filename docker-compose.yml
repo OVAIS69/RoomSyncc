@@ -6,24 +6,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=roomsync_db
-      - POSTGRES_USER=roomsync_user
-      - POSTGRES_PASSWORD=roomsync_password
+      - POSTGRES_DB=${DB_NAME:-roomsync_db}
+      - POSTGRES_USER=${DB_USER:-roomsync_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-roomsync_password}
 
   backend:
     build: 
-      context: ./RoomSync Backend main
+      context: ./backend
     command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 room_booking_system.wsgi:application"
     volumes:
-      - ./RoomSync Backend main:/app
+      - ./backend:/app
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=False
-      - ALLOWED_HOSTS=*,localhost,127.0.0.1
-      - DB_NAME=roomsync_db
-      - DB_USER=roomsync_user
-      - DB_PASSWORD=roomsync_password
+      - DEBUG=${DEBUG:-False}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - DB_NAME=${DB_NAME:-roomsync_db}
+      - DB_USER=${DB_USER:-roomsync_user}
+      - DB_PASSWORD=${DB_PASSWORD:-roomsync_password}
       - DB_HOST=db
       - DB_PORT=5432
     depends_on:
@@ -31,7 +32,7 @@ services:
 
   frontend:
     build:
-      context: ./RoomSync..-main
+      context: ./frontend
     ports:
       # Map localhost:80 to container:80
       - "80:80"
