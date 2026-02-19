@@ -16,4 +16,5 @@ COPY backend/ .
 WORKDIR /app/room_booking_system
 
 # Run the server on port 8000
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "room_booking_system.wsgi:application"]
+# Run migrations and collect static files, then start the server
+CMD sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 room_booking_system.wsgi:application"
