@@ -15,8 +15,10 @@ class Command(BaseCommand):
         admin_password = 'admin123'
         
         if User.objects.filter(username=admin_username).exists():
-            self.stdout.write(self.style.WARNING(f'Admin user "{admin_username}" already exists'))
+            self.stdout.write(self.style.WARNING(f'Admin user "{admin_username}" already exists. Resetting password.'))
             admin_user = User.objects.get(username=admin_username)
+            admin_user.set_password(admin_password)
+            admin_user.save()
         else:
             admin_user = User.objects.create_user(
                 username=admin_username,
