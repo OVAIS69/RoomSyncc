@@ -1,5 +1,5 @@
 // API Service for RoomSync Backend
-const API_BASE = (process.env.REACT_APP_API_URL || 'http://localhost:8000') + '/api';
+const API_BASE = ((process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '')) + '/api';
 
 // Helper function to get CSRF token from cookies
 const getCookie = (name: string): string | null => {
