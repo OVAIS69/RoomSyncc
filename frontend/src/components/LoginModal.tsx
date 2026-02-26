@@ -39,12 +39,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center modal p-4">
-            <div className="bg-gray-800 rounded-2xl p-8 max-w-md w-full border border-gray-700 shadow-2xl transform transition-all">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[2rem] p-8 max-w-md w-full shadow-2xl transform transition-all">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-[var(--text-primary)]">
                         Welcome Back
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
@@ -58,27 +58,27 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-300">Username</label>
+                        <label className="block text-sm font-medium mb-2 text-[var(--text-secondary)]">Username</label>
                         <input
                             type="text"
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-3 rounded-xl border bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                             placeholder="Enter your username"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
+                        <label className="block text-sm font-medium mb-2 text-[var(--text-secondary)]">Password</label>
                         <input
                             type="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-3 rounded-xl border bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                             placeholder="••••••••"
                         />
                     </div>
@@ -92,7 +92,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     </button>
                 </form>
 
-                <p className="mt-6 text-center text-sm text-gray-400">
+                <p className="mt-6 text-center text-sm text-[var(--text-secondary)]">
                     Contact your administrator for account access.
                 </p>
             </div>
