@@ -160,7 +160,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ setCurrentPage, showNotificat
                                 Access the underlying Django framework dashboard for advanced database management.
                             </p>
                             <a
-                                href="http://localhost:8000/admin/"
+                                href={`${process.env.REACT_APP_API_URL?.replace(/\/+$/, '') || 'http://localhost:8000'}/admin/`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center justify-center space-x-2 w-full py-3 bg-white text-emerald-700 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
