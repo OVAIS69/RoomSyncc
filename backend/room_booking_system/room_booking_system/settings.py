@@ -29,7 +29,7 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,*').split(',')
 
 # CSRF Settings
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000,http://localhost,http://127.0.0.1').split(',')
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000,http://localhost,http://127.0.0.1,https://roomsyncc-1.onrender.com').split(',')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # or smtp.office365.com for Outlook
@@ -179,7 +179,7 @@ AUTH_USER_MODEL = 'users.User'
 # Helper to strip paths/trailing slashes from origins
 CORS_ALLOWED_ORIGINS = [
     origin.strip().rstrip('/') 
-    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
+    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000,https://roomsyncc-1.onrender.com').split(',')
 ]
 
 CORS_ALLOW_CREDENTIALS = True
