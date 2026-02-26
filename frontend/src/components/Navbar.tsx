@@ -151,9 +151,19 @@ const Navbar: React.FC<NavbarProps> = ({
             <div className="mt-4 pt-4 border-t border-[var(--border)]">
               {user ? (
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3 px-4 py-2">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
-                      <User size={20} className="text-indigo-600" />
+                  <div
+                    onClick={() => {
+                      setCurrentPage('profile');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10 cursor-pointer transition-all duration-200"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center overflow-hidden">
+                      {user.avatar ? (
+                        <img src={`${process.env.REACT_APP_API_URL?.replace(/\/+$/, '') || 'http://localhost:8000'}${user.avatar}`} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={20} className="text-indigo-600" />
+                      )}
                     </div>
                     <div>
                       <p className="text-[var(--text-primary)] font-bold">{user.username}</p>
