@@ -9,12 +9,15 @@ const getCookie = (name: string): string | null => {
     return null;
 };
 
+// Memory fallback to hold CSRF token when dealing with cross-domain APIs that cannot read the CSRF cookie
+let memoryCsrfToken: string = '';
+
 // Helper function for API calls with credentials
 const apiCall = async (url: string, options: RequestInit = {}) => {
     const isFormData = options.body instanceof FormData;
 
     const headers: any = {
-        'X-CSRFToken': getCookie('csrftoken') || '',
+        'X-CSRFToken': memoryCsrfToken || getCookie('csrftoken') || '',
         ...options.headers,
     };
 
@@ -46,7 +49,14 @@ const apiCall = async (url: string, options: RequestInit = {}) => {
         return null;
     }
 
-    return response.json();
+    const data = await response.json();
+
+    // Automatically intercept CSRF token from JSON responses if backend provides it
+    if (data && data.csrf_token) {
+        memoryCsrfToken = data.csrf_token;
+    }
+
+    return data;
 };
 
 // Room API

@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import login, logout
+from django.middleware.csrf import get_token
 from .models import User
 from .serializers import UserSerializer, UserRegistrationSerializer, LoginSerializer
 
@@ -18,7 +19,8 @@ def register_view(request):
         login(request, user)
         return Response({
             'message': 'Registration successful',
-            'user': UserSerializer(user).data
+            'user': UserSerializer(user).data,
+            'csrf_token': get_token(request)
         }, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -35,7 +37,8 @@ def login_view(request):
         login(request, user)
         return Response({
             'message': 'Login successful',
-            'user': UserSerializer(user).data
+            'user': UserSerializer(user).data,
+            'csrf_token': get_token(request)
         })
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -64,11 +67,13 @@ def check_auth_view(request):
     if request.user.is_authenticated:
         return Response({
             'authenticated': True,
-            'user': UserSerializer(request.user).data
+            'user': UserSerializer(request.user).data,
+            'csrf_token': get_token(request)
         })
     return Response({
         'authenticated': False,
-        'user': None
+        'user': None,
+        'csrf_token': get_token(request)
     })
 
 
