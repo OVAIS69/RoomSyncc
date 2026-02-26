@@ -27,9 +27,10 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
   ];
 
   return (
-    <footer className="relative mt-20">
-      {/* Glass gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 via-purple-900/20 to-emerald-900/20 backdrop-blur-sm border-t border-white/10"></div>
+    <footer className="relative mt-20 border-t border-[var(--border)] overflow-hidden">
+      {/* Dynamic background */}
+      <div className="absolute inset-0 bg-[var(--bg-secondary)] opacity-80 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-emerald-500/5"></div>
 
       <div className="relative z-10 px-4 py-12 max-w-7xl mx-auto">
         {/* Main footer content */}
@@ -37,19 +38,13 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-600 to-emerald-500 rounded-xl flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/20 via-purple-400/20 to-emerald-400/20"></div>
-                <div className="relative z-10 flex items-center justify-center">
-                  <Building className="w-7 h-7 text-white" />
-                  <div className="w-1 h-1 bg-white rounded-full ml-0.5"></div>
-                </div>
-              </div>
+              <img src="/logo.png" alt="RoomSync Logo" className="w-12 h-12 object-contain" />
               <div>
-                <h3 className="text-xl font-bold text-white">RoomSync</h3>
-                <p className="text-xs text-indigo-300 font-medium">Campus Management</p>
+                <h3 className="text-[var(--text-primary)] text-xl font-bold">RoomSync</h3>
+                <p className="text-[var(--accent-indigo)] text-xs font-semibold tracking-wider uppercase">Campus Management</p>
               </div>
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
               Modern campus management system providing seamless room booking,
               interactive campus maps, and efficient scheduling solutions for
               educational institutions.
@@ -58,8 +53,8 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Users className="w-5 h-5 text-indigo-400" />
+            <h4 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Users className="w-5 h-5 text-[var(--accent-indigo)]" />
               Quick Links
             </h4>
             <ul className="space-y-2">
@@ -68,14 +63,14 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                   {setCurrentPage ? (
                     <button
                       onClick={() => setCurrentPage(link.page)}
-                      className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-200 text-sm w-full text-left"
+                      className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-indigo)] transition-colors duration-200 text-sm font-medium w-full text-left"
                     >
-                      <link.icon className="w-4 h-4 text-indigo-400" />
+                      <link.icon className="w-4 h-4 opacity-70" />
                       {link.name}
                     </button>
                   ) : (
-                    <span className="flex items-center gap-2 text-gray-300 text-sm">
-                      <link.icon className="w-4 h-4 text-indigo-400" />
+                    <span className="flex items-center gap-2 text-[var(--text-secondary)] text-sm font-medium">
+                      <link.icon className="w-4 h-4 opacity-70" />
                       {link.name}
                     </span>
                   )}
@@ -86,8 +81,8 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Mail className="w-5 h-5 text-emerald-400" />
+            <h4 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Mail className="w-5 h-5 text-[var(--accent-cyan)]" />
               Contact Us
             </h4>
             <ul className="space-y-2">
@@ -95,9 +90,9 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                 <li key={index}>
                   <a
                     href={contact.href}
-                    className="flex items-start gap-2 text-gray-300 hover:text-white transition-colors duration-200 text-sm"
+                    className="flex items-start gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-cyan)] transition-colors duration-200 text-sm font-medium"
                   >
-                    <contact.icon className="w-4 h-4 text-emerald-400 mt-1 shrink-0" />
+                    <contact.icon className="w-4 h-4 mt-1 shrink-0 opacity-70" />
                     <span className="break-words">{contact.text}</span>
                   </a>
                 </li>
@@ -107,8 +102,8 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
 
           {/* Legal Links */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Building className="w-5 h-5 text-purple-400" />
+            <h4 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Building className="w-5 h-5 text-purple-500" />
               Legal
             </h4>
             <ul className="space-y-2">
@@ -117,12 +112,12 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                   {setCurrentPage ? (
                     <button
                       onClick={() => setCurrentPage(link.page)}
-                      className="text-gray-300 hover:text-white transition-colors duration-200 text-sm w-full text-left"
+                      className="text-[var(--text-secondary)] hover:text-purple-500 transition-colors duration-200 text-sm font-medium w-full text-left"
                     >
                       {link.name}
                     </button>
                   ) : (
-                    <span className="text-gray-300 text-sm">
+                    <span className="text-[var(--text-secondary)] text-sm font-medium">
                       {link.name}
                     </span>
                   )}
@@ -133,29 +128,23 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-8"></div>
+        <div className="h-px bg-[var(--border)] opacity-50 mb-8"></div>
 
         {/* Bottom section */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           {/* Copyright */}
           <div className="text-center md:text-left">
-            <p className="text-gray-400 text-sm">
+            <p className="text-[var(--text-tertiary)] text-sm font-medium">
               © {currentYear} RoomSync. All rights reserved.
             </p>
           </div>
 
           {/* Member Info */}
-          <div className="text-center md:text-right">
-            <p className="text-gray-400 text-sm">
-              Team Member: <span className="text-indigo-400 font-medium">Ovais Shaikh</span>
+          <div className="text-center md:text-right space-y-1">
+            <p className="text-[var(--text-tertiary)] text-xs font-semibold uppercase tracking-wider mb-2">Developed By</p>
+            <p className="text-[var(--text-secondary)] text-sm font-bold">
+              Ovais Shaikh • Noorsharma Ansari • Sneha Singh
             </p>
-            <p className="text-gray-400 text-sm">
-              Team Member: <span className="text-indigo-400 font-medium">Noorsharma Ansari</span>
-            </p>
-            <p className="text-gray-400 text-sm">
-              Team Member: <span className="text-indigo-400 font-medium">Sneha Singh</span>
-            </p>
-
           </div>
         </div>
       </div>

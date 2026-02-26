@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from users.models import User
 from bookings.models import Booking
-from rooms.models import Room
+from rooms.models import Room, Block
 from datetime import datetime, timedelta
 
 
@@ -9,6 +9,34 @@ class Command(BaseCommand):
     help = 'Creates default admin user and sample bookings for testing'
 
     def handle(self, *args, **kwargs):
+        # Create Sample Blocks
+        self.stdout.write(self.style.SUCCESS('🏗 Creating sample blocks and rooms...'))
+        
+        main_block, _ = Block.objects.get_or_create(name='Main Block')
+        science_block, _ = Block.objects.get_or_create(name='Science Block')
+        library_block, _ = Block.objects.get_or_create(name='Library')
+
+        # Create Sample Rooms
+        rooms_data = [
+            {'number': '101', 'block': main_block, 'type': 'Classroom', 'capacity': 60},
+            {'number': '102', 'block': main_block, 'type': 'Classroom', 'capacity': 60},
+            {'number': '201', 'block': science_block, 'type': 'Lab', 'capacity': 30},
+            {'number': '202', 'block': science_block, 'type': 'Computer Lab', 'capacity': 40},
+            {'number': '301', 'block': library_block, 'type': 'Reading Room', 'capacity': 100},
+        ]
+
+        for r in rooms_data:
+            Room.objects.get_or_create(
+                room_number=r['number'],
+                block=r['block'],
+                defaults={
+                    'room_type': r['type'],
+                    'capacity': r['capacity'],
+                    'features': ['Projector', 'AC'] if r['type'] == 'Classroom' else ['Computers', 'Whiteboard'],
+                    'is_active': True
+                }
+            )
+
         # Create default admin user
         admin_username = 'admin'
         admin_email = 'admin@roomsync.com'

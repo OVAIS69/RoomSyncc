@@ -33,46 +33,46 @@ const SupportPage: React.FC<SupportPageProps> = ({ showNotification }) => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center text-white">Support & Help</h1>
+      <h1 className="text-4xl font-extrabold mb-10 text-center text-[var(--text-primary)]">Support & Help</h1>
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Contact Form */}
-        <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-lg">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-white">
-            <Mail className="w-6 h-6 text-indigo-600" />
+        <div className="bg-[var(--surface)] rounded-2xl p-8 border border-[var(--border)] shadow-xl">
+          <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-[var(--text-primary)]">
+            <Mail className="w-7 h-7 text-indigo-600" />
             Contact Us
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-white">Name</label>
+              <label className="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">Name</label>
               <input
                 type="text"
                 value={contactForm.name}
                 onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 rounded-xl border bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 placeholder:text-[var(--text-tertiary)]"
                 placeholder="Your full name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-white">Email</label>
+              <label className="block text-sm font-semibold mb-2 text-[var(--text-secondary)]">Email</label>
               <input
                 type="email"
                 value={contactForm.email}
                 onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 rounded-xl border bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 placeholder:text-[var(--text-tertiary)]"
                 placeholder="your.email@college.edu"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-white">Message</label>
+              <label className="block text-sm font-medium mb-2 text-[var(--text-secondary)]">Message</label>
               <textarea
                 value={contactForm.message}
                 onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                 rows={5}
-                className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none"
+                className="w-full px-4 py-3 rounded-xl border bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
                 placeholder="How can we help you?"
               />
             </div>
@@ -88,24 +88,24 @@ const SupportPage: React.FC<SupportPageProps> = ({ showNotification }) => {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-lg">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-white">
-            <MessageSquare className="w-6 h-6 text-purple-600" />
+        <div className="bg-[var(--surface)] rounded-2xl p-8 border border-[var(--border)] shadow-xl">
+          <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-[var(--text-primary)]">
+            <MessageSquare className="w-7 h-7 text-purple-600" />
             Frequently Asked Questions
           </h2>
 
           <div className="space-y-4">
             {faqData.map((faq, idx) => (
-              <div key={idx} className="border rounded-xl border-gray-600">
+              <div key={idx} className="border rounded-xl border-[var(--border)] overflow-hidden transition-all duration-200 hover:border-indigo-500/30">
                 <button
                   onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                  className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-700/50 transition-all duration-200 rounded-xl text-white"
+                  className="w-full px-5 py-4 text-left flex items-center justify-between hover:bg-indigo-500/5 transition-all duration-200 text-[var(--text-primary)]"
                 >
-                  <span className="font-medium">{faq.question}</span>
-                  {expandedFAQ === idx ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  <span className="font-bold">{faq.question}</span>
+                  {expandedFAQ === idx ? <ChevronUp size={20} className="text-indigo-600" /> : <ChevronDown size={20} className="text-[var(--text-tertiary)]" />}
                 </button>
                 {expandedFAQ === idx && (
-                  <div className="px-4 pb-3 text-gray-300">
+                  <div className="px-5 pb-5 text-[var(--text-secondary)] leading-relaxed border-t border-[var(--border)] pt-4">
                     {faq.answer}
                   </div>
                 )}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Calendar, Clock, Mail, MessageSquare } from 'lucide-react';
 
 interface Room {
   id: number;
@@ -51,181 +51,161 @@ const BookingModal: React.FC<BookingModalProps> = ({
 }) => {
   if (!showBookingModal) return null;
 
+  const currentHour = new Date().getHours();
+  const currentMinute = new Date().getMinutes();
+  const startHour = parseInt((selectedTime.split('-')[0] || '09:00').split(':')[0]);
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">Quick Book Room</h2>
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-[9999] bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-[var(--surface)] rounded-[2rem] p-6 max-w-2xl w-full max-h-[95vh] overflow-x-hidden overflow-y-auto shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] relative border border-[var(--border)]">
+        {/* Decorative background element */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none"></div>
+
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider rounded-full">
+                Professional Booking
+              </span>
+            </div>
+            <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight leading-none">
+              Booking <br />
+              <span className="text-indigo-600">Room {selectedRoom?.room_number || selectedRoom?.name || ''}</span>
+            </h2>
+          </div>
           <button
             onClick={() => setShowBookingModal(false)}
-            className="p-2 rounded-lg hover:bg-gray-700 transition-all duration-200 text-gray-300"
+            className="p-3 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all duration-200"
           >
             <X size={24} />
           </button>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2 text-white">Select Room</label>
-            <select
-              value={selectedRoom?.id || ''}
-              onChange={(e) => setSelectedRoom(rooms.find(r => r.id === Number(e.target.value)) || null)}
-              className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-            >
-              <option value="">Choose a room...</option>
-              {rooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.room_number} - {room.room_type}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="w-full">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Date & Time Column */}
+              <div className="space-y-4">
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Calendar size={18} className="text-indigo-600" />
+                    <label className="text-sm font-bold text-[var(--text-primary)]">Booking Date</label>
+                  </div>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                  />
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2 text-white">Date</label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-            />
-          </div>
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Clock size={18} className="text-indigo-600" />
+                    <label className="text-sm font-bold text-[var(--text-primary)]">Time Interval (Start - End)</label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="7"
+                        max="17"
+                        value={parseInt((selectedTime.split('-')[0] || '09:00').split(':')[0])}
+                        onChange={(e) => {
+                          let val = parseInt(e.target.value);
+                          if (isNaN(val)) val = 9;
+                          if (val < 7) val = 7;
+                          if (val > 17) val = 17;
+                          const hourStr = val.toString().padStart(2, '0');
+                          const currentEnd = selectedTime.split('-')[1] || '10:00';
+                          setSelectedTime(`${hourStr}:00-${currentEnd}`);
+                        }}
+                        className="w-full pl-4 pr-12 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500 outline-none"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] font-bold">:00</span>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="7"
+                        max="17"
+                        value={parseInt((selectedTime.split('-')[1] || '10:00').split(':')[0])}
+                        onChange={(e) => {
+                          let val = parseInt(e.target.value);
+                          if (isNaN(val)) val = 10;
+                          if (val < 7) val = 7;
+                          if (val > 17) val = 17;
+                          const hourStr = val.toString().padStart(2, '0');
+                          const currentStart = selectedTime.split('-')[0] || '09:00';
+                          setSelectedTime(`${currentStart}-${hourStr}:00`);
+                        }}
+                        className="w-full pl-4 pr-12 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500 outline-none"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] font-bold">:00</span>
+                    </div>
+                  </div>
+                  {(new Date(selectedDate).toDateString() === new Date().toDateString()) &&
+                    (startHour < currentHour || (startHour === currentHour && currentMinute > 0)) && (
+                      <p className="text-red-500 text-xs font-bold mt-3 animate-pulse">⚠️ Start time is in the past</p>
+                    )}
+                </div>
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* Start Time Selection */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-white">Start Hour (07-17)</label>
-              <div className="relative">
-                <input
-                  type="number"
-                  min="7"
-                  max="17"
-                  value={parseInt((selectedTime.split('-')[0] || '09:00').split(':')[0])}
-                  onChange={(e) => {
-                    let val = parseInt(e.target.value);
-                    if (isNaN(val)) val = 9;
-                    if (val < 7) val = 7;
-                    if (val > 17) val = 17;
+              {/* Details Column */}
+              <div className="space-y-4">
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Mail size={18} className="text-indigo-600" />
+                    <label className="text-sm font-bold text-[var(--text-primary)]">Contact Reference</label>
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Enter email (optional)"
+                    value={facultyEmail}
+                    onChange={(e) => setFacultyEmail(e.target.value)}
+                    className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-[var(--text-tertiary)]"
+                  />
+                </div>
 
-                    const hourStr = val.toString().padStart(2, '0');
-                    const currentEnd = selectedTime.split('-')[1] || '10:00';
-                    setSelectedTime(`${hourStr}:00-${currentEnd}`);
-                  }}
-                  className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                  placeholder="9"
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                  :00
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Calendar size={18} className="text-indigo-600" />
+                    <label className="text-sm font-bold text-[var(--text-primary)]">Purpose of Booking</label>
+                  </div>
+                  <textarea
+                    value={eventDetails}
+                    onChange={(e) => setEventDetails(e.target.value)}
+                    placeholder="Description..."
+                    rows={2}
+                    className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none placeholder:text-[var(--text-tertiary)]"
+                  />
                 </div>
               </div>
             </div>
 
-            {/* End Time Selection */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-white">End Hour (07-17)</label>
-              <div className="relative">
-                <input
-                  type="number"
-                  min="7"
-                  max="17"
-                  value={parseInt((selectedTime.split('-')[1] || '10:00').split(':')[0])}
-                  onChange={(e) => {
-                    let val = parseInt(e.target.value);
-                    if (isNaN(val)) val = 10;
-                    if (val < 7) val = 7;
-                    if (val > 17) val = 17;
-
-                    const hourStr = val.toString().padStart(2, '0');
-                    const currentStart = selectedTime.split('-')[0] || '09:00';
-                    setSelectedTime(`${currentStart}-${hourStr}:00`);
-                  }}
-                  className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                  placeholder="10"
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                  :00
-                </div>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <button
+                onClick={() => setShowBookingModal(false)}
+                className="flex-1 bg-[var(--bg-secondary)] text-[var(--text-primary)] py-3 rounded-xl font-bold border border-[var(--border)] hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBookRoom}
+                disabled={isLoading || (new Date(selectedDate).toDateString() === new Date().toDateString() && (startHour < currentHour || (startHour === currentHour && currentMinute > 0)))}
+                className={`flex-[2] bg-indigo-600 text-white py-3 rounded-xl font-black text-lg shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/50 transform transition-all duration-300 ${isLoading ? 'opacity-70 cursor-wait' : 'hover:-translate-y-1'}`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-3 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    Securing Space...
+                  </span>
+                ) : (
+                  'Confirm Booking'
+                )}
+              </button>
             </div>
           </div>
-
-          {(() => {
-            const today = new Date();
-            const selectedDateObj = new Date(selectedDate);
-            const isToday = selectedDateObj.toDateString() === today.toDateString();
-            const currentHour = today.getHours();
-            const currentMinute = today.getMinutes();
-
-            const startHour = parseInt((selectedTime.split('-')[0] || '09:00').split(':')[0]);
-
-            // Check if start time is in the past (if today)
-            const isPastTime = isToday && (startHour < currentHour || (startHour === currentHour && currentMinute > 0));
-
-            if (isPastTime) {
-              return <p className="text-red-400 text-sm mt-2">⚠️ Cannot book for a past time.</p>;
-            }
-            return null;
-          })()}
-
-          {/* Faculty Email Field - Only for Admins */}
-          {/* Note: We need to pass userRole to this component to check if admin */}
-          <div className="relative">
-            <label className="block text-sm font-medium mb-2 text-white">Faculty Email (for notification)</label>
-            <input
-              type="email"
-              placeholder="faculty@example.com"
-              value={facultyEmail}
-              onChange={(e) => setFacultyEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-              id="faculty-email-input"
-            />
-            <p className="text-xs text-gray-400 mt-1">Leave blank to use your own email.</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2 text-white">Event Details</label>
-            <textarea
-              value={eventDetails}
-              onChange={(e) => setEventDetails(e.target.value)}
-              placeholder="Enter event description..."
-              rows={3}
-              className="w-full px-4 py-3 rounded-xl border bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none"
-            />
-          </div>
-
-          <button
-            onClick={handleBookRoom}
-            disabled={isLoading || (() => {
-              const today = new Date();
-              const selectedDateObj = new Date(selectedDate);
-              const isToday = selectedDateObj.toDateString() === today.toDateString();
-              const currentHour = today.getHours();
-              const currentMinute = today.getMinutes();
-              const startHour = parseInt((selectedTime.split('-')[0] || '09:00').split(':')[0]);
-              return isToday && (startHour < currentHour || (startHour === currentHour && currentMinute > 0));
-            })()}
-            className={`w-full bg-gradient-to-r from-indigo-600 to-purple-500 text-white py-3 rounded-xl font-semibold hover:scale-105 transform transition-all duration-200 shadow-lg hover:shadow-xl ${isLoading || (() => {
-              const today = new Date();
-              const selectedDateObj = new Date(selectedDate);
-              const isToday = selectedDateObj.toDateString() === today.toDateString();
-              const currentHour = today.getHours();
-              const currentMinute = today.getMinutes();
-              const startHour = parseInt((selectedTime.split('-')[0] || '09:00').split(':')[0]);
-              return isToday && (startHour < currentHour || (startHour === currentHour && currentMinute > 0));
-            })() ? 'opacity-70 cursor-not-allowed hover:scale-100' : ''}`}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing...
-              </span>
-            ) : (
-              'Book Now'
-            )}
-          </button>
         </div>
       </div>
     </div>

@@ -66,15 +66,10 @@ class BookingViewSet(viewsets.ModelViewSet):
         faculty_email = serializer.validated_data.get('faculty_email', None)
         print(f"DEBUG: perform_create called. faculty_email={faculty_email}")
 
-        # Validate faculty email if provided by admin
-        if self.request.user.role == 'admin' and faculty_email:
-            User = get_user_model()
-            try:
-                user_obj = User.objects.get(email=faculty_email)
-                if user_obj.role != 'faculty':
-                    raise ValidationError({"faculty_email": "The provided email does not belong to a Faculty member."})
-            except User.DoesNotExist:
-                raise ValidationError({"faculty_email": "No user found with this email."})
+        # Admin can provide any faculty email for notifications/overrides
+        # We don't strictly require the user to be registered in the system
+        # to allow booking for external faculty or guest accounts via Admin panel.
+        pass
         
         # 'faculty_email' is now a model field, so we DO NOT pop it. serializer.save() will handle it.
 

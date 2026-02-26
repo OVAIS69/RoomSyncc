@@ -6,6 +6,7 @@ import Dashboard from './Dashboard';
 import BookingPage from './BookingPage';
 import BlueprintView from './BlueprintView';
 import AboutPage from './AboutPage';
+import ProfilePage from './ProfilePage';
 import SupportPage from './SupportPage';
 import CalendarView from './CalendarView';
 import RoomDetailsModal from './RoomDetailsModal';
@@ -59,11 +60,24 @@ const RoomSync = () => {
   const [eventDetails, setEventDetails] = useState('');
   const [facultyEmail, setFacultyEmail] = useState(''); // New state for admin override
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('roomsync-theme') as 'light' | 'dark') || 'light';
+  });
 
   // Scroll to top on page change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPage, user]);
+
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('roomsync-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   // Fetch rooms on mount
   useEffect(() => {
@@ -143,15 +157,16 @@ const RoomSync = () => {
 
       await bookingAPI.create(bookingData);
 
-      // Refresh bookings
-      const updatedBookings = await bookingAPI.getAll();
-      setBookings(updatedBookings);
-
+      // Close all modals immediately for better UX
       setShowBookingModal(false);
-      setSelectedRoom(null); // Close the details modal to return to map
+      setSelectedRoom(null);
       setEventDetails('');
-      setFacultyEmail(''); // Reset email
-      showNotification('Room booked and confirmed! Confirmation email sent.');
+      setFacultyEmail('');
+
+      // Refresh data in background
+      bookingAPI.getAll().then(updated => setBookings(updated));
+
+      showNotification('Room booked and confirmed! Windows closing.');
     } catch (error: any) {
       showNotification(error.message || 'Failed to book room', 'error');
     }
@@ -211,22 +226,27 @@ const RoomSync = () => {
   const renderPage = () => {
     if (loading || authLoading) {
       return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-white text-xl">Loading...</div>
+        <div className="flex items-center justify-center min-h-screen bg-[var(--bg-primary)]">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 bg-indigo-500/10 rounded-full animate-pulse"></div>
+            </div>
+          </div>
         </div>
       );
     }
 
     // Guest Access Control
     // If user is not logged in, they can ONLY see 'dashboard'
+    // For now, let's show the Restricted View so they know why
     if (!user && currentPage !== 'dashboard' && currentPage !== 'about') {
       // Optional: You could redirect to 'dashboard' here or show restricted view
-      // For now, let's show the Restricted View so they know why
       return (
         <div className="flex items-center justify-center min-h-[60vh] flex-col gap-4">
-          <div className="text-center p-8 rounded-2xl bg-gray-800/50 backdrop-blur-md border border-gray-700">
-            <h2 className="text-2xl font-bold mb-2 text-white">Access Restricted</h2>
-            <p className="text-gray-300 mb-4">You need to log in to access this page.</p>
+          <div className="text-center p-8 rounded-2xl bg-[var(--surface)] backdrop-blur-md border border-[var(--border)] shadow-xl">
+            <h2 className="text-2xl font-bold mb-2 text-[var(--text-primary)]">Access Restricted</h2>
+            <p className="text-[var(--text-secondary)] mb-4">You need to log in to access this page.</p>
             <button
               onClick={() => setShowLoginModal(true)}
               className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium"
@@ -248,10 +268,15 @@ const RoomSync = () => {
             selectedDate={selectedDate}
             setSelectedRoom={setSelectedRoom}
             rooms={rooms}
+            theme={theme}
+            toggleTheme={toggleTheme}
           />
         );
       case 'about':
         return <AboutPage />;
+      case 'profile':
+        if (!user) return null;
+        return <ProfilePage setCurrentPage={setCurrentPage} showNotification={showNotification} />;
       case 'booking':
         // Double check login just in case
         if (!user) return null;
@@ -285,10 +310,12 @@ const RoomSync = () => {
         // Available to logged in users
         return <SupportPage showNotification={showNotification} />;
       case 'admin-users':
-        if (user?.role !== 'admin') return <Dashboard user={user} setCurrentPage={setCurrentPage} bookings={bookings} selectedDate={selectedDate} setSelectedRoom={setSelectedRoom} rooms={rooms} />;
-        return <UserManagement />;
+      case 'users':
+        if (user?.role !== 'admin') return <Dashboard user={user} setCurrentPage={setCurrentPage} bookings={bookings} selectedDate={selectedDate} setSelectedRoom={setSelectedRoom} rooms={rooms} theme={theme} toggleTheme={toggleTheme} />;
+        return <UserManagement showNotification={showNotification} />;
       case 'admin-support':
-        if (user?.role !== 'admin') return <Dashboard user={user} setCurrentPage={setCurrentPage} bookings={bookings} selectedDate={selectedDate} setSelectedRoom={setSelectedRoom} rooms={rooms} />;
+      case 'support-admin':
+        if (user?.role !== 'admin') return <Dashboard user={user} setCurrentPage={setCurrentPage} bookings={bookings} selectedDate={selectedDate} setSelectedRoom={setSelectedRoom} rooms={rooms} theme={theme} toggleTheme={toggleTheme} />;
         return <AdminSupportPanel />;
       case 'calendar':
         // RESTRICTED: Faculty should NOT see this if they can't book
@@ -297,9 +324,9 @@ const RoomSync = () => {
         if (user?.role === 'faculty') {
           return (
             <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center p-8 rounded-2xl bg-gray-800/50 backdrop-blur-md border border-gray-700">
-                <h2 className="text-2xl font-bold mb-2 text-white">Access Denied</h2>
-                <p className="text-gray-300">Faculty members use the 'Room Availability' view.</p>
+              <div className="text-center p-8 rounded-2xl bg-[var(--surface)] backdrop-blur-md border border-[var(--border)] shadow-xl">
+                <h2 className="text-2xl font-bold mb-2 text-[var(--text-primary)]">Access Denied</h2>
+                <p className="text-[var(--text-secondary)]">Faculty members use the 'Room Availability' view.</p>
                 <button onClick={() => setCurrentPage('room-availability')} className="mt-4 text-indigo-400 hover:text-indigo-300 underline">Go to Room Availability</button>
               </div>
             </div>
@@ -322,21 +349,28 @@ const RoomSync = () => {
         return <CookiePage setCurrentPage={setCurrentPage} />;
       case 'admin':
       case 'admin-availability':
+        if (user?.role !== 'admin') return <Dashboard user={user} setCurrentPage={setCurrentPage} bookings={bookings} selectedDate={selectedDate} setSelectedRoom={setSelectedRoom} rooms={rooms} theme={theme} toggleTheme={toggleTheme} />;
+        return <AdminDashboard activeView="availability" showNotification={showNotification} />;
       case 'admin-bookings':
+        if (user?.role !== 'admin') return <Dashboard user={user} setCurrentPage={setCurrentPage} bookings={bookings} selectedDate={selectedDate} setSelectedRoom={setSelectedRoom} rooms={rooms} theme={theme} toggleTheme={toggleTheme} />;
+        return <AdminDashboard activeView="bookings" showNotification={showNotification} />;
       case 'admin-rooms':
-      case 'admin-blocks':
         if (user?.role !== 'admin') {
           return (
             <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center p-8 rounded-2xl bg-gray-800/50 backdrop-blur-md border border-gray-700">
-                <h2 className="text-2xl font-bold mb-2 text-white">Access Denied</h2>
-                <p className="text-gray-300">Only administrators can access this page.</p>
+              <div className="text-center p-8 rounded-2xl bg-[var(--surface)] backdrop-blur-md border border-[var(--border)] shadow-xl">
+                <h2 className="text-2xl font-bold mb-2 text-[var(--text-primary)]">Access Denied</h2>
+                <p className="text-[var(--text-secondary)]">Only administrators can access this page.</p>
               </div>
             </div>
           );
         }
+        return <AdminDashboard activeView="rooms" showNotification={showNotification} />;
+      case 'admin-rooms':
+      case 'admin-blocks':
+        if (user?.role !== 'admin') return <Dashboard user={user} setCurrentPage={setCurrentPage} bookings={bookings} selectedDate={selectedDate} setSelectedRoom={setSelectedRoom} rooms={rooms} theme={theme} toggleTheme={toggleTheme} />;
         const view = currentPage.startsWith('admin-') ? currentPage.replace('admin-', '') : 'availability';
-        return <AdminDashboard activeView={view as any} />;
+        return <AdminDashboard activeView={view as any} showNotification={showNotification} />;
       default:
         return (
           <Dashboard
@@ -346,13 +380,16 @@ const RoomSync = () => {
             selectedDate={selectedDate}
             setSelectedRoom={setSelectedRoom}
             rooms={rooms}
+            theme={theme}
+            toggleTheme={toggleTheme}
           />
         );
     }
   };
 
   return (
-    <div className="min-h-screen transition-all duration-300 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen transition-all duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)] font-outfit selection:bg-indigo-500/30">
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,var(--accent-indigo),transparent_50%)] opacity-[0.03] pointer-events-none"></div>
       <Navbar
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
@@ -376,6 +413,7 @@ const RoomSync = () => {
         userRole={user?.role || ''}
         setShowBookingModal={setShowBookingModal}
         getRoomStatus={(roomId: string) => getRoomStatus(Number(roomId))}
+        isBookingOpen={showBookingModal}
       />
       <BookingModal
         showBookingModal={showBookingModal}
@@ -397,7 +435,10 @@ const RoomSync = () => {
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
       {/* Notifications */}
-      <Notification notification={notification} />
+      <Notification
+        notification={notification}
+        onClose={() => setNotification(null)}
+      />
 
       {/* Footer */}
       <Footer setCurrentPage={setCurrentPage} />

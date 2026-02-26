@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building, MapPin, MessageSquare, Calendar, Clock, Users, CheckCircle } from 'lucide-react';
+import { Building, MapPin, MessageSquare, Calendar, Clock, Users, CheckCircle, Sun, Moon } from 'lucide-react';
 
 interface DashboardProps {
   user: any;
@@ -8,12 +8,16 @@ interface DashboardProps {
   setCurrentPage: (page: string) => void;
   setSelectedRoom: (room: any) => void;
   rooms: any[];
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
   user,
   setCurrentPage,
   bookings,
+  theme,
+  toggleTheme
 }) => {
   const userRole = user?.role;
   const displayName = user?.first_name || user?.username || 'User';
@@ -22,20 +26,35 @@ const Dashboard: React.FC<DashboardProps> = ({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900/50 via-gray-900 to-black border border-gray-700 shadow-2xl p-8 md:p-12">
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand-secondary via-brand-primary to-brand-primary border border-cyber-border shadow-2xl p-8 md:p-16 group cyber-glow-strong">
+
+        {/* Theme Toggle */}
+        <div className="absolute top-6 right-6 z-30">
+          <button
+            onClick={toggleTheme}
+            className="p-3 rounded-2xl bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] shadow-xl hover:-translate-y-1 transition-all duration-300"
+            aria-label="Toggle Theme"
+          >
+            {theme === 'light' ? <Moon size={24} className="text-indigo-600" /> : <Sun size={24} className="text-amber-400" />}
+          </button>
+        </div>
+
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6">
-            <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
-            <span className="text-xs font-medium text-indigo-300 tracking-wide uppercase">System Operational</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-vibrant-cyan/10 border border-brand-vibrant-cyan/20 mb-8 backdrop-blur-md">
+            <span className="flex h-2 w-2 rounded-full bg-brand-vibrant-cyan animate-pulse"></span>
+            <span className="text-xs font-bold text-brand-vibrant-cyan tracking-widest uppercase">System Operational</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-            Welcome back, <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">{displayName}</span>
+          <h1 className="text-5xl md:text-7xl font-black text-text-primary mb-8 leading-[1.1] tracking-tight">
+            Welcome back, <br />
+            <span className="bg-gradient-to-r from-brand-vibrant-cyan via-brand-vibrant-blue to-brand-vibrant-indigo bg-clip-text text-transparent">
+              {displayName}
+            </span>
           </h1>
-          <p className="text-lg text-gray-400 mb-8 max-w-2xl leading-relaxed">
-            Manage your campus room bookings efficiently.
+          <p className="text-xl text-text-secondary mb-10 max-w-2xl leading-relaxed font-light">
+            Experience the future of campus management.
             {userRole === 'admin'
-              ? ' You have full control over rooms, bookings, and user management.'
-              : ' Check availability and coordinate with the administration easily.'}
+              ? ' You have full command over architectural room logic and user orchestration.'
+              : ' Streamline your schedule and coordinate with precision.'}
           </p>
 
           {/* Today's Bookings Summary */}
@@ -75,10 +94,10 @@ const Dashboard: React.FC<DashboardProps> = ({
             return null;
           })()}
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-5">
             <button
               onClick={() => setCurrentPage('room-availability')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-gray-900 font-bold hover:bg-gray-100 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-vibrant-cyan to-brand-vibrant-blue text-white font-bold hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] transition-all duration-300 transform hover:-translate-y-1 shadow-xl"
             >
               <MapPin className="w-5 h-5" />
               Check Availability
@@ -86,7 +105,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             {userRole !== 'admin' && (
               <button
                 onClick={() => setCurrentPage('support')}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-800 text-white font-semibold border border-gray-700 hover:border-gray-600 hover:bg-gray-700 transition-all duration-200"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/5 text-white font-semibold border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
               >
                 <MessageSquare className="w-5 h-5" />
                 Contact Support
@@ -95,32 +114,32 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        {/* Abstract Decorative Elements */}
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Animated Orbs */}
+        <div className="absolute top-0 right-0 -mt-24 -mr-24 w-[30rem] h-[30rem] bg-brand-vibrant-cyan/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+        <div className="absolute bottom-0 left-0 -mb-24 -ml-24 w-[25rem] h-[25rem] bg-brand-vibrant-indigo/15 rounded-full blur-[100px] animate-pulse-slow delay-1000"></div>
       </div>
 
       {/* Quick Actions Grid */}
       <div className="animate-slide-up delay-100">
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+        <h2 className="text-2xl font-bold text-text-primary mb-6 flex items-center gap-3">
           <Clock className="w-6 h-6 text-yellow-500" />
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div
             onClick={() => setCurrentPage('room-availability')}
-            className="group cursor-pointer p-6 rounded-2xl bg-gray-800/50 border border-gray-700 hover:border-indigo-500/50 hover:bg-gray-800 transition-all duration-300 relative overflow-hidden"
+            className="group cursor-pointer p-8 rounded-3xl glass border-cyber-border hover:border-brand-vibrant-cyan/30 hover:bg-brand-vibrant-cyan/5 transition-all duration-500 relative overflow-hidden shadow-2xl"
           >
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <MapPin className="w-24 h-24 text-indigo-500 rotate-12" />
+            <div className="absolute -top-10 -right-10 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500">
+              <MapPin className="w-48 h-48 text-brand-vibrant-cyan rotate-12" />
             </div>
-            <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400 group-hover:scale-110 transition-transform duration-300">
-              <MapPin className="w-6 h-6" />
+            <div className="w-14 h-14 rounded-2xl bg-brand-vibrant-cyan/10 flex items-center justify-center mb-6 text-brand-vibrant-cyan group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] transition-all duration-500">
+              <MapPin className="w-7 h-7" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Room Map</h3>
-            <p className="text-gray-400 text-sm mb-4">View interactive blueprint and availability.</p>
-            <div className="flex items-center text-indigo-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
-              View Map
+            <h3 className="text-2xl font-bold text-text-primary mb-3">Room Map</h3>
+            <p className="text-text-secondary text-sm mb-6 leading-relaxed">View interactive blueprint and real-time room availability across campus.</p>
+            <div className="flex items-center text-brand-vibrant-cyan text-sm font-bold group-hover:translate-x-2 transition-transform duration-300">
+              Explore Map <span className="ml-2">→</span>
             </div>
           </div>
 
@@ -128,35 +147,35 @@ const Dashboard: React.FC<DashboardProps> = ({
             <>
               <div
                 onClick={() => setCurrentPage('admin-bookings')}
-                className="group cursor-pointer p-6 rounded-2xl bg-gray-800/50 border border-gray-700 hover:border-purple-500/50 hover:bg-gray-800 transition-all duration-300 relative overflow-hidden"
+                className="group cursor-pointer p-8 rounded-3xl glass border-cyber-border hover:border-brand-vibrant-purple/30 hover:bg-brand-vibrant-purple/5 transition-all duration-500 relative overflow-hidden shadow-2xl"
               >
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Calendar className="w-24 h-24 text-purple-500 rotate-12" />
+                <div className="absolute -top-10 -right-10 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500">
+                  <Calendar className="w-48 h-48 text-brand-vibrant-purple rotate-12" />
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4 text-purple-400 group-hover:scale-110 transition-transform duration-300">
-                  <Calendar className="w-6 h-6" />
+                <div className="w-14 h-14 rounded-2xl bg-brand-vibrant-purple/10 flex items-center justify-center mb-6 text-brand-vibrant-purple group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] transition-all duration-500">
+                  <Calendar className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Bookings</h3>
-                <p className="text-gray-400 text-sm mb-4">Manage room reservations and requests.</p>
-                <div className="flex items-center text-purple-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
-                  Manage
+                <h3 className="text-2xl font-bold text-text-primary mb-3">Bookings</h3>
+                <p className="text-text-secondary text-sm mb-6 leading-relaxed">Manage room reservations, requests, and archival booking data.</p>
+                <div className="flex items-center text-brand-vibrant-purple text-sm font-bold group-hover:translate-x-2 transition-transform duration-300">
+                  Access Records <span className="ml-2">→</span>
                 </div>
               </div>
 
               <div
                 onClick={() => setCurrentPage('admin-users')}
-                className="group cursor-pointer p-6 rounded-2xl bg-gray-800/50 border border-gray-700 hover:border-emerald-500/50 hover:bg-gray-800 transition-all duration-300 relative overflow-hidden"
+                className="group cursor-pointer p-8 rounded-3xl glass border-cyber-border hover:border-brand-vibrant-blue/30 hover:bg-brand-vibrant-blue/5 transition-all duration-500 relative overflow-hidden shadow-2xl"
               >
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Users className="w-24 h-24 text-emerald-500 rotate-12" />
+                <div className="absolute -top-10 -right-10 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500">
+                  <Users className="w-48 h-48 text-brand-vibrant-blue -rotate-12" />
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                  <Users className="w-6 h-6" />
+                <div className="w-14 h-14 rounded-2xl bg-brand-vibrant-blue/10 flex items-center justify-center mb-6 text-brand-vibrant-blue group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-500">
+                  <Users className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Users</h3>
-                <p className="text-gray-400 text-sm mb-4">Manage user roles and permissions.</p>
-                <div className="flex items-center text-emerald-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
-                  Manage
+                <h3 className="text-2xl font-bold text-text-primary mb-3">Users</h3>
+                <p className="text-text-secondary text-sm mb-6 leading-relaxed">Orchestrate user roles, authentication protocols, and access levels.</p>
+                <div className="flex items-center text-brand-vibrant-blue text-sm font-bold group-hover:translate-x-2 transition-transform duration-300">
+                  Manage Directory <span className="ml-2">→</span>
                 </div>
               </div>
             </>
@@ -165,18 +184,18 @@ const Dashboard: React.FC<DashboardProps> = ({
           {userRole !== 'admin' && (
             <div
               onClick={() => setCurrentPage('support')}
-              className="group cursor-pointer p-6 rounded-2xl bg-gray-800/50 border border-gray-700 hover:border-blue-500/50 hover:bg-gray-800 transition-all duration-300 relative overflow-hidden"
+              className="group cursor-pointer p-8 rounded-3xl glass border-cyber-border hover:border-brand-vibrant-blue/30 hover:bg-brand-vibrant-blue/5 transition-all duration-500 relative overflow-hidden shadow-2xl"
             >
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <MessageSquare className="w-24 h-24 text-blue-500 rotate-12" />
+              <div className="absolute -top-10 -right-10 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500">
+                <MessageSquare className="w-48 h-48 text-brand-vibrant-blue rotate-12" />
               </div>
-              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4 text-blue-400 group-hover:scale-110 transition-transform duration-300">
-                <MessageSquare className="w-6 h-6" />
+              <div className="w-14 h-14 rounded-2xl bg-brand-vibrant-blue/10 flex items-center justify-center mb-6 text-brand-vibrant-blue group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-500">
+                <MessageSquare className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Support</h3>
-              <p className="text-gray-400 text-sm mb-4">Need help? Send a message to admins.</p>
-              <div className="flex items-center text-blue-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
-                Contact
+              <h3 className="text-2xl font-bold text-text-primary mb-3">Support</h3>
+              <p className="text-text-secondary text-sm mb-6 leading-relaxed">Direct channel to administration for queries and technical assistance.</p>
+              <div className="flex items-center text-brand-vibrant-blue text-sm font-bold group-hover:translate-x-2 transition-transform duration-300">
+                Start Chat <span className="ml-2">→</span>
               </div>
             </div>
           )}
@@ -185,31 +204,31 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Info Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-gray-800 rounded-2xl border border-gray-700 p-8">
-          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <Building className="w-5 h-5 text-gray-400" />
+        <div className="lg:col-span-2 bg-cyber-card rounded-2xl border border-cyber-border p-8 shadow-sm">
+          <h3 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
+            <Building className="w-5 h-5 text-text-secondary" />
             Facility Overview
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-gray-700/50 border border-gray-600">
-              <div className="text-gray-400 text-sm mb-1">Operating Hours</div>
-              <div className="text-lg font-semibold text-white flex items-center gap-2">
+            <div className="p-4 rounded-xl bg-brand-secondary/50 border border-cyber-border">
+              <div className="text-text-secondary text-sm mb-1">Operating Hours</div>
+              <div className="text-lg font-semibold text-text-primary flex items-center gap-2">
                 <Clock className="w-4 h-4 text-indigo-400" />
                 08:00 AM - 07:00 PM
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gray-700/50 border border-gray-600">
-              <div className="text-gray-400 text-sm mb-1">Room Types</div>
-              <div className="text-lg font-semibold text-white">
+            <div className="p-4 rounded-xl bg-brand-secondary/50 border border-cyber-border">
+              <div className="text-text-secondary text-sm mb-1">Room Types</div>
+              <div className="text-lg font-semibold text-text-primary">
                 Classrooms, Labs, Halls
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700 p-8 shadow-lg">
-          <h3 className="text-xl font-bold text-white mb-4">Admin Notice</h3>
-          <p className="text-gray-300 text-sm leading-relaxed mb-6">
+        <div className="bg-brand-secondary rounded-2xl border border-cyber-border p-8 shadow-sm">
+          <h3 className="text-xl font-bold text-text-primary mb-4">Admin Notice</h3>
+          <p className="text-text-secondary text-sm leading-relaxed mb-6">
             Please ensure all room bookings are finalized 24 hours in advance. For urgent requests, contact the facility manager directly.
           </p>
           <div className="text-xs text-gray-500 font-medium">

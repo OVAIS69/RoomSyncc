@@ -11,19 +11,34 @@ const getCookie = (name: string): string | null => {
 
 // Helper function for API calls with credentials
 const apiCall = async (url: string, options: RequestInit = {}) => {
+    const isFormData = options.body instanceof FormData;
+
+    const headers: any = {
+        'X-CSRFToken': getCookie('csrftoken') || '',
+        ...options.headers,
+    };
+
+    if (!isFormData && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
+
     const defaultOptions: RequestInit = {
         credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken') || '',
-            ...options.headers,
-        },
+        headers,
     };
 
     const response = await fetch(url, { ...defaultOptions, ...options });
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
+
+        // Handle DRF validation errors (objects)
+        if (typeof error === 'object' && !error.detail) {
+            const firstError = Object.values(error)[0];
+            const message = Array.isArray(firstError) ? firstError[0] : firstError;
+            throw new Error(message || 'Validation failed');
+        }
+
         throw new Error(error.detail || JSON.stringify(error));
     }
 
@@ -235,6 +250,13 @@ export const authAPI = {
 
     checkAuth: async () => {
         return apiCall(`${API_BASE}/auth/check/`);
+    },
+
+    updateProfile: async (data: FormData) => {
+        return apiCall(`${API_BASE}/users/profile/`, {
+            method: 'PUT',
+            body: data,
+        });
     },
 };
 

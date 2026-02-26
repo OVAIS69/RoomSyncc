@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
@@ -28,13 +28,10 @@ const Navbar: React.FC<NavbarProps> = ({
   let navItems: string[] = [];
 
   if (!user) {
-    // Guests see no nav items (just the logo for Home)
     navItems = [];
   } else if (user.role === 'admin') {
-    // Admins see specific management tabs directly in the navbar
     navItems = ['admin-availability', 'admin-bookings', 'admin-rooms', 'admin-blocks', 'admin-users', 'admin-support'];
   } else {
-    // Faculty/Students view (dashboard, room availability, about, support) - REMOVED calendar/schedule
     navItems = ['dashboard', 'room-availability', 'about', 'support'];
   }
 
@@ -43,45 +40,40 @@ const Navbar: React.FC<NavbarProps> = ({
       case 'dashboard': return 'Home';
       case 'calendar': return 'Schedule';
       case 'room-availability': return 'Room Availability';
-      case 'admin-availability': return 'Live Availability';
-      case 'admin-bookings': return 'Booking Records';
-      case 'admin-rooms': return 'Room Management';
+      case 'admin-availability': return 'Live Map';
+      case 'admin-bookings': return 'Bookings';
+      case 'admin-rooms': return 'Rooms';
       case 'admin-blocks': return 'Blocks';
-      case 'admin-users': return 'User Management';
-      case 'admin-support': return 'Support Messages';
+      case 'admin-users': return 'Users';
+      case 'admin-support': return 'Support';
       default: return page;
     }
   };
 
   return (
-    <nav className="sticky top-0 z-50 transition-all duration-300 bg-gray-900/95 border-b border-gray-700">
+    <nav className="sticky top-0 z-50 transition-all duration-300 bg-[var(--surface)] border-b border-[var(--border)] shadow-sm backdrop-blur-md bg-opacity-80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div
-            className="flex items-center space-x-3 mr-8 cursor-pointer hover:opacity-90 transition-opacity"
+            className="flex items-center space-x-2 sm:space-x-3 md:mr-8 cursor-pointer hover:opacity-90 transition-opacity"
             onClick={() => setCurrentPage('dashboard')}
           >
-            <div className="relative">
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-purple-500 rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 border-2 border-white rounded-sm"></div>
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-sm border-2 border-white"></div>
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
+            <img src="/logo.png" alt="RoomSync Logo" className="w-9 h-9 sm:w-12 sm:h-12 object-contain" />
+            <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent tracking-tight">
               RoomSync
             </h1>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1">
             {navItems.map((page) => (
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`capitalize transition-all duration-200 hover:scale-105 ${currentPage === page
-                  ? 'text-indigo-600 font-semibold'
-                  : 'text-gray-300 hover:text-white'
+                className={`capitalize text-sm font-semibold transition-all duration-300 px-4 py-2 rounded-xl whitespace-nowrap ${currentPage === page
+                  ? 'bg-indigo-50/80 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-500/20 shadow-sm shadow-indigo-500/5 backdrop-blur-md'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] border border-transparent'
                   }`}
               >
                 {getLabel(page)}
@@ -90,29 +82,35 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Right side controls */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             {user ? (
               <div className="hidden md:flex items-center space-x-4">
                 <div
-                  className="flex items-center space-x-2 text-gray-300 cursor-pointer hover:text-white transition-colors"
-                  onClick={() => setCurrentPage('dashboard')}
+                  className="flex items-center space-x-2 px-3 py-1.5 rounded-xl border border-transparent hover:border-[var(--border)] hover:bg-[var(--bg-secondary)] hover:shadow-sm transition-all text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] relative"
+                  onClick={() => setCurrentPage('profile')}
                 >
-                  <User size={18} />
-                  <span className="text-sm">
-                    {user.username} <span className="text-indigo-400">({user.role})</span>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-50 dark:from-indigo-500/20 dark:to-indigo-500/10 flex items-center justify-center border border-indigo-200/50 dark:border-indigo-500/30 shadow-sm shadow-indigo-500/10 overflow-hidden">
+                    {user.avatar ? (
+                      <img src={`http://localhost:8000${user.avatar}`} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <User size={16} className="text-indigo-600" />
+                    )}
+                  </div>
+                  <span className="text-sm font-bold">
+                    {user.username} <span className="text-indigo-500 opacity-60">({user.role})</span>
                   </span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-200"
+                  className="px-4 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 rounded-xl transition-all duration-200"
                 >
-                  <span>Logout</span>
+                  Logout
                 </button>
               </div>
             ) : (
               <button
                 onClick={onLoginClick}
-                className="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-500 hover:scale-105 rounded-lg transition-all duration-200"
+                className="hidden md:flex items-center space-x-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all duration-300 font-bold text-white shadow-lg shadow-indigo-600/20 hover:-translate-y-0.5"
               >
                 <span>Login</span>
               </button>
@@ -121,7 +119,7 @@ const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg transition-all duration-200"
+              className="md:hidden p-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] transition-all duration-200"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -130,55 +128,57 @@ const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden pb-4 bg-gray-900">
-            {navItems.map((page) => (
-              <button
-                key={page}
-                onClick={() => {
-                  setCurrentPage(page);
-                  setMobileMenuOpen(false);
-                }}
-                className={`block w-full text-left px-4 py-2 capitalize transition-all duration-200 ${currentPage === page
-                  ? 'text-indigo-600 font-semibold'
-                  : 'text-gray-300 hover:text-white'
-                  }`}
-              >
-                {getLabel(page)}
-              </button>
-            ))}
+          <div className="md:hidden pb-6 pt-2 animate-in slide-in-from-top-4 duration-300">
+            <div className="space-y-1">
+              {navItems.map((page) => (
+                <button
+                  key={page}
+                  onClick={() => {
+                    setCurrentPage(page);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-3 rounded-xl capitalize transition-all duration-200 ${currentPage === page
+                    ? 'bg-indigo-50 text-indigo-600 font-bold dark:bg-indigo-500/10'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
+                    }`}
+                >
+                  {getLabel(page)}
+                </button>
+              ))}
+            </div>
 
             {/* Mobile Auth */}
-            <div className="mt-4 px-4 pt-4 border-t border-gray-700">
+            <div className="mt-4 pt-4 border-t border-[var(--border)]">
               {user ? (
-                <>
-                  <div
-                    className="flex items-center space-x-2 text-gray-300 cursor-pointer hover:text-white transition-colors"
-                    onClick={() => setCurrentPage('dashboard')}
-                  >
-                    <User size={18} />
-                    <span className="text-sm">
-                      {user.username} <span className="text-indigo-400">({user.role})</span>
-                    </span>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3 px-4 py-2">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
+                      <User size={20} className="text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-[var(--text-primary)] font-bold">{user.username}</p>
+                      <p className="text-[var(--text-tertiary)] text-xs uppercase tracking-widest font-bold">{user.role}</p>
+                    </div>
                   </div>
                   <button
                     onClick={() => {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-200"
+                    className="w-full py-3 text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 rounded-xl font-bold transition-all duration-200"
                   >
-                    <span>Logout</span>
+                    Logout
                   </button>
-                </>
+                </div>
               ) : (
                 <button
                   onClick={() => {
                     onLoginClick();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-500 rounded-lg transition-all duration-200"
+                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition-all duration-200"
                 >
-                  <span>Login</span>
+                  Login
                 </button>
               )}
             </div>

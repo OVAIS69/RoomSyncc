@@ -52,44 +52,44 @@ const AdminSupportPanel = () => {
     };
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-400">Loading messages...</div>;
+        return <div className="p-8 text-center text-text-secondary italic">Loading messages...</div>;
     }
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8 text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold mb-8 text-text-primary flex items-center gap-3">
                 <Mail className="w-8 h-8 text-indigo-500" />
                 Support Messages
             </h1>
 
             <div className="grid gap-4">
                 {messages.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-800 rounded-xl border border-gray-700">
-                        <p className="text-gray-400">No support messages found.</p>
+                    <div className="text-center py-12 bg-cyber-card rounded-xl border border-cyber-border">
+                        <p className="text-text-secondary">No support messages found.</p>
                     </div>
                 ) : (
                     messages.map((msg) => (
                         <div
                             key={msg.id}
-                            className={`p-6 rounded-xl border transition-all duration-200 ${msg.is_read
-                                ? 'bg-gray-800 border-gray-700 opacity-75'
-                                : 'bg-gray-800 border-indigo-500 shadow-lg shadow-indigo-500/10'
+                            className={`p-6 rounded-2xl border transition-all duration-300 ${msg.is_read
+                                ? 'bg-[var(--surface)] border-[var(--border)] opacity-80'
+                                : 'bg-[var(--surface)] border-indigo-500 shadow-lg shadow-indigo-500/10'
                                 }`}
                         >
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-white">{msg.name}</h3>
-                                    <p className="text-indigo-400 text-sm">{msg.email}</p>
+                                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{msg.name}</h3>
+                                    <p className="text-indigo-600 font-medium text-sm">{msg.email}</p>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-gray-500 text-xs flex items-center gap-1">
+                                    <span className="text-text-secondary text-xs flex items-center gap-1">
                                         <Clock className="w-3 h-3" />
                                         {new Date(msg.created_at).toLocaleString()}
                                     </span>
                                     {!msg.is_read && (
                                         <button
                                             onClick={() => markAsRead(msg.id)}
-                                            className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-full transition-colors flex items-center gap-1"
+                                            className="px-3 py-1 bg-brand-vibrant-indigo hover:bg-opacity-90 text-white text-xs rounded-full transition-colors flex items-center gap-1 shadow-sm"
                                         >
                                             <CheckCircle className="w-3 h-3" />
                                             Mark as Read
@@ -104,7 +104,7 @@ const AdminSupportPanel = () => {
                                     </button>
                                 </div>
                             </div>
-                            <div className="bg-gray-900/50 p-4 rounded-lg text-gray-300 whitespace-pre-wrap">
+                            <div className="bg-[var(--bg-secondary)] p-5 rounded-xl text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap border border-[var(--border)]">
                                 {msg.message}
                             </div>
                         </div>

@@ -8,6 +8,7 @@ interface User {
     role: 'admin' | 'faculty';
     first_name?: string;
     last_name?: string;
+    avatar?: string;
 }
 
 interface AuthContextType {

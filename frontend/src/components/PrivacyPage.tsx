@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building } from 'lucide-react';
+import { Building, CheckCircle, User, MessageSquare, Clock, Calendar, Users, MapPin, Mail } from 'lucide-react';
 
 interface PrivacyPageProps {
   setCurrentPage?: (page: string) => void;
@@ -7,197 +7,127 @@ interface PrivacyPageProps {
 
 const PrivacyPage: React.FC<PrivacyPageProps> = ({ setCurrentPage }) => {
   return (
-    <div className="px-4 py-8 max-w-4xl mx-auto">
+    <div className="px-4 py-12 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 mb-6">
+      <div className="mb-12 text-center md:text-left">
+        <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
           {setCurrentPage && (
             <button
               onClick={() => setCurrentPage('dashboard')}
-              className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
+              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-semibold transition-colors duration-200"
             >
               <Building className="w-5 h-5" />
               Back to Home
             </button>
           )}
         </div>
-        
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-            <Building className="w-7 h-7 text-white" />
+
+        <div className="flex flex-col md:flex-row items-center gap-6 mb-8 text-[var(--text-primary)]">
+          <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[1.25rem] flex items-center justify-center shadow-xl shadow-emerald-500/20">
+            <CheckCircle className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white">Privacy Policy</h1>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-[var(--text-primary)] tracking-tight">Privacy Policy</h1>
+            <p className="text-[var(--text-tertiary)] text-lg font-medium mt-1">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
         </div>
-        <p className="text-gray-300 text-lg">
-          Your privacy is important to us. This policy explains how we collect, use, and protect your information.
+        <p className="text-[var(--text-secondary)] text-xl leading-relaxed max-w-2xl">
+          Your privacy is at the core of everything we build. This policy details how we handle your data with transparency and security.
         </p>
       </div>
 
       {/* Privacy Content */}
-      <div className="space-y-8">
-        {/* Information Collection */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <Building className="w-5 h-5 text-emerald-400" />
-              1. Information We Collect
+      <div className="space-y-6">
+        {/* Section Template */}
+        {[
+          {
+            icon: User,
+            title: "1. Information We Collect",
+            color: "text-emerald-500",
+            content: (
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {['Name and contact details', 'User credentials', 'Booking history', 'Device and usage data'].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-secondary)] font-medium">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )
+          },
+          {
+            icon: Clock,
+            title: "2. How We Use Information",
+            color: "text-blue-500",
+            content: "We use your information strictly to provide services, process bookings, send essential notifications, and continuously improve the RoomSync experience while ensuring platform security."
+          },
+          {
+            icon: MessageSquare,
+            title: "3. Information Sharing",
+            color: "text-purple-500",
+            content: "We never sell your data. Sharing only occurs with your consent, for legal compliance, or with trusted service providers who help us operate our essential services."
+          },
+          {
+            icon: CheckCircle,
+            title: "4. Data Security",
+            color: "text-indigo-500",
+            content: "We employ industry-standard encryption and security protocols to safeguard your personal data against unauthorized access or disclosure."
+          },
+          {
+            icon: Calendar,
+            title: "5. Data Retention",
+            color: "text-orange-500",
+            content: "Information is kept only as long as necessary for administrative purposes or as required by institutional policies."
+          },
+          {
+            icon: Users,
+            title: "6. Your Rights",
+            color: "text-pink-500",
+            content: "You have full control over your data. You may access, correct, or request deletion of your information at any time through your account settings or by contacting us."
+          },
+          {
+            icon: MapPin,
+            title: "7. Cookies",
+            color: "text-amber-600",
+            content: "We use essential cookies to maintain your session and improve site performance. You can manage these preferences in your browser."
+          },
+          {
+            icon: Building,
+            title: "8. Third Parties",
+            color: "text-cyan-500",
+            content: "Our platform may link to campus resources. We are not responsible for the privacy practices of external institutional sites."
+          },
+          {
+            icon: Mail,
+            title: "9. Contact Us",
+            color: "text-indigo-600",
+            content: (
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100 dark:bg-indigo-500/5 dark:border-indigo-500/20">
+                <div className="p-3 bg-indigo-600 rounded-xl">
+                  <Mail className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-[var(--text-secondary)] font-medium">For any privacy concerns, reach out to:</p>
+                  <a href="mailto:privacy@campus.edu" className="text-indigo-600 font-bold hover:underline">privacy@campus.edu</a>
+                </div>
+              </div>
+            )
+          }
+        ].map((section, idx) => (
+          <section key={idx} className="bg-[var(--surface)] rounded-3xl p-8 border border-[var(--border)] shadow-sm hover:shadow-md transition-all duration-300">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6 flex items-center gap-3">
+              <section.icon className={`w-7 h-7 ${section.color}`} />
+              {section.title}
             </h2>
-          <div className="space-y-4 text-gray-300">
-            <p className="leading-relaxed">
-              We collect information that you provide directly to us, including:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Name and contact information</li>
-              <li>User credentials and authentication data</li>
-              <li>Room booking preferences and history</li>
-              <li>Communication preferences</li>
-              <li>Technical information about your device and usage</li>
-            </ul>
-          </div>
-        </section>
+            <div className="text-[var(--text-secondary)] leading-relaxed text-lg font-medium">
+              {section.content}
+            </div>
+          </section>
+        ))}
+      </div>
 
-        {/* How We Use Information */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <Building className="w-5 h-5 text-blue-400" />
-              2. How We Use Your Information
-            </h2>
-          <div className="space-y-4 text-gray-300">
-            <p className="leading-relaxed">
-              We use the information we collect to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Provide and maintain our services</li>
-              <li>Process room bookings and manage schedules</li>
-              <li>Send notifications and updates about your bookings</li>
-              <li>Improve our services and user experience</li>
-              <li>Ensure security and prevent fraud</li>
-              <li>Comply with legal obligations</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Information Sharing */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <Building className="w-5 h-5 text-purple-400" />
-              3. Information Sharing and Disclosure
-            </h2>
-          <div className="space-y-4 text-gray-300">
-            <p className="leading-relaxed">
-              We do not sell, trade, or otherwise transfer your personal information to third parties, except:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>With your explicit consent</li>
-              <li>To comply with legal requirements</li>
-              <li>To protect our rights and safety</li>
-              <li>With service providers who assist in our operations</li>
-              <li>In connection with a business transfer or merger</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Data Security */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <Building className="w-5 h-5 text-emerald-400" />
-              4. Data Security
-            </h2>
-          <p className="text-gray-300 leading-relaxed">
-            We implement appropriate technical and organizational security measures to protect your personal information 
-            against unauthorized access, alteration, disclosure, or destruction. These measures include encryption, 
-            secure servers, and regular security assessments.
-          </p>
-        </section>
-
-        {/* Data Retention */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">5. Data Retention</h2>
-          <p className="text-gray-300 leading-relaxed">
-            We retain your personal information only for as long as necessary to fulfill the purposes outlined in this 
-            policy, comply with legal obligations, resolve disputes, and enforce our agreements. Booking history is 
-            typically retained for 2 years for administrative purposes.
-          </p>
-        </section>
-
-        {/* Your Rights */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">6. Your Rights and Choices</h2>
-          <div className="space-y-4 text-gray-300">
-            <p className="leading-relaxed">
-              You have the right to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Access and review your personal information</li>
-              <li>Correct inaccurate or incomplete information</li>
-              <li>Request deletion of your personal information</li>
-              <li>Object to certain processing activities</li>
-              <li>Withdraw consent where applicable</li>
-              <li>Request data portability</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Cookies */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">7. Cookies and Tracking Technologies</h2>
-          <p className="text-gray-300 leading-relaxed">
-            We use cookies and similar tracking technologies to enhance your experience, analyze usage patterns, 
-            and provide personalized content. You can control cookie settings through your browser preferences, 
-            though disabling certain cookies may affect functionality.
-          </p>
-        </section>
-
-        {/* Third Party Services */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">8. Third-Party Services</h2>
-          <p className="text-gray-300 leading-relaxed">
-            Our service may contain links to third-party websites or services. We are not responsible for the 
-            privacy practices of these external sites. We encourage you to review their privacy policies before 
-            providing any personal information.
-          </p>
-        </section>
-
-        {/* Children's Privacy */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">9. Children's Privacy</h2>
-          <p className="text-gray-300 leading-relaxed">
-                         RoomSync is not intended for children under 13 years of age. We do not knowingly collect personal
-             information from children under 13. If you are a parent or guardian and believe your child has provided
-             us with personal information, please contact us immediately.
-          </p>
-        </section>
-
-        {/* Changes to Policy */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">10. Changes to This Policy</h2>
-          <p className="text-gray-300 leading-relaxed">
-            We may update this Privacy Policy from time to time. We will notify you of any material changes by 
-            posting the new policy on this page and updating the "Last Updated" date. Your continued use of 
-                         RoomSync after such changes constitutes acceptance of the updated policy.
-          </p>
-        </section>
-
-        {/* Contact */}
-        <section className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">11. Contact Us</h2>
-          <p className="text-gray-300 leading-relaxed">
-            If you have any questions about this Privacy Policy or our data practices, please contact us at{' '}
-            <a href="mailto:privacy@campus.edu" className="text-emerald-400 hover:text-emerald-300">
-              privacy@campus.edu
-            </a>
-          </p>
-        </section>
-
-        {/* Last Updated */}
-        <div className="text-center py-6">
-          <p className="text-gray-400 text-sm">
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
-        </div>
+      <div className="mt-12 text-center p-8 border-t border-[var(--border)]">
+        <p className="text-[var(--text-tertiary)] font-bold uppercase tracking-widest text-xs">RoomSync • Professional Edition</p>
       </div>
     </div>
   );

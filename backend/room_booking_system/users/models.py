@@ -5,7 +5,7 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
         ('faculty', 'Faculty'),
-        ('student_rep', 'Student Representative'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     email = models.EmailField(unique=True)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)

@@ -49,9 +49,10 @@ interface BlockData {
 
 interface AdminDashboardProps {
     activeView?: 'availability' | 'bookings' | 'rooms' | 'blocks';
+    showNotification?: (message: string, type: 'success' | 'error') => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availability' }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availability', showNotification }) => {
     // State
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [rooms, setRooms] = useState<RoomData[]>([]);
@@ -166,7 +167,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
             setBlocks(blocksData);
             setBookings(allBookingsData);
         } catch (error: any) {
-            showNotification('Failed to load dashboard data', 'error');
+            internalShowNotification('Failed to load dashboard data', 'error');
         } finally {
             setLoading(false);
         }
@@ -200,9 +201,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
         }
     };
 
-    const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
-        setNotification({ message, type });
-        setTimeout(() => setNotification(null), 3000);
+    const internalShowNotification = (message: string, type: 'success' | 'error' = 'success') => {
+        if (showNotification) {
+            showNotification(message, type);
+        } else {
+            setNotification({ message, type });
+            setTimeout(() => setNotification(null), 3000);
+        }
     };
 
     // --- Admin Booking Logic (Replica of RoomSync.tsx for Admin Panel) ---
@@ -264,7 +269,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
     const handleBookRoom = async () => {
         console.log('DEBUG: handleBookRoom called. State facultyEmail:', facultyEmail);
         if (!selectedRoom || !eventDetails.trim()) {
-            showNotification('Please fill in all required fields', 'error');
+            internalShowNotification('Please fill in all required fields', 'error');
             return;
         }
 
@@ -295,9 +300,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
             setSelectedRoom(null); // Close the details modal
             setEventDetails('');
             setFacultyEmail('');
-            showNotification('Room reserved successfully (Admin Override)');
+            internalShowNotification('Room reserved successfully (Admin Override)');
         } catch (error: any) {
-            showNotification(error.message || 'Failed to book room', 'error');
+            internalShowNotification(error.message || 'Failed to book room', 'error');
         } finally {
             setBookingLoading(false); // Stop loading
         }
@@ -325,13 +330,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
 
         try {
             await bookingAPI.delete(id);
-            showNotification(successMessage);
+            internalShowNotification(successMessage);
             // Re-fetch to ensure sync, though optimistic update handles the visual
             fetchBookings();
         } catch (error: any) {
             // Revert on error
             setBookings(previousBookings);
-            showNotification(error.message || 'Failed to delete booking', 'error');
+            internalShowNotification(error.message || 'Failed to delete booking', 'error');
         }
     };
 
@@ -341,12 +346,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
         if (!newBlockName.trim()) return;
         try {
             await roomAPI.createBlock(newBlockName);
-            showNotification('Block created successfully');
+            internalShowNotification('Block created successfully');
             setNewBlockName('');
             setShowBlockModal(false);
             fetchBlocks();
         } catch (error: any) {
-            showNotification(error.message || 'Failed to create block', 'error');
+            internalShowNotification(error.message || 'Failed to create block', 'error');
         }
     };
 
@@ -354,10 +359,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
         if (!window.confirm('Delete this block? Warning: This may affect rooms linked to it.')) return;
         try {
             await roomAPI.deleteBlock(id);
-            showNotification('Block deleted successfully');
+            internalShowNotification('Block deleted successfully');
             fetchBlocks();
         } catch (error: any) {
-            showNotification(error.message || 'Failed to delete block', 'error');
+            internalShowNotification(error.message || 'Failed to delete block', 'error');
         }
     };
 
@@ -368,15 +373,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
             const payload = { ...roomForm, block: parseInt(roomForm.block) };
             if (editingRoom) {
                 await roomAPI.update(editingRoom.id, payload);
-                showNotification('Room updated successfully');
+                internalShowNotification('Room updated successfully');
             } else {
                 await roomAPI.create(payload);
-                showNotification('Room created successfully');
+                internalShowNotification('Room created successfully');
             }
             setShowRoomModal(false);
             fetchRooms();
         } catch (error: any) {
-            showNotification(error.message || 'Failed to save room', 'error');
+            internalShowNotification(error.message || 'Failed to save room', 'error');
         }
     };
 
@@ -384,10 +389,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
         if (!window.confirm('Confirm deletion of this room?')) return;
         try {
             await roomAPI.delete(id);
-            showNotification('Room removed successfully');
+            internalShowNotification('Room removed successfully');
             fetchRooms();
         } catch (error: any) {
-            showNotification(error.message || 'Failed to delete room', 'error');
+            internalShowNotification(error.message || 'Failed to delete room', 'error');
         }
     };
 
@@ -416,7 +421,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white font-sans">
+        <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
             {/* Header */}
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -444,18 +449,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                 </div>
 
                 {/* Notification Toast */}
-                {notification && (
-                    <div className={`fixed top-24 right-8 z-50 p-4 rounded-lg shadow-lg border animate-fade-in-down ${notification.type === 'success' ? 'bg-green-900 border-green-500 text-white' : 'bg-red-900 border-red-500 text-white'
-                        }`}>
-                        <div className="flex items-center gap-2">
-                            {notification.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <X className="w-5 h-5" />}
-                            <span>{notification.message}</span>
+                {notification && !showNotification && (
+                    <div className="fixed inset-0 flex items-center justify-center p-4 custom-alert" style={{ zIndex: 9999 }}>
+                        <div className={`p-5 rounded-2xl shadow-2xl border backdrop-blur-md animate-scale-in ${notification.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-600' : 'bg-red-500/10 border-red-500/50 text-red-600'}`}>
+                            <div className="flex items-center gap-3 font-bold">
+                                {notification.type === 'success' ? <CheckCircle className="w-6 h-6" /> : <X className="w-6 h-6" />}
+                                <span className="text-lg">{notification.message}</span>
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {/* Content Area */}
-                <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-lg min-h-[500px]">
+                <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-xl min-h-[500px]">
 
                     {/* LIVE AVAILABILITY (BLUEPRINT) VIEW */}
                     {activeTab === 'availability' && (
@@ -474,8 +480,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                     {activeTab === 'bookings' && (
                         <div className="p-6 space-y-6">
                             {/* Controls */}
-                            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-900/50 p-4 rounded-xl border border-gray-700">
-                                <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+                            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[var(--bg-secondary)] p-5 rounded-2xl border border-[var(--border)] shadow-sm">
+                                <div className="flex bg-[var(--bg-tertiary)] rounded-xl p-1 border border-[var(--border)]">
                                     <button
                                         onClick={() => setBookingFilter('upcoming')}
                                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${bookingFilter === 'upcoming'
@@ -510,7 +516,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                                     <div
                                         key={booking.id}
                                         onClick={() => setSelectedBooking(booking)}
-                                        className="group bg-gray-700/30 hover:bg-gray-700/50 border border-gray-700 hover:border-indigo-500/50 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
+                                        className="group bg-brand-secondary/50 hover:bg-brand-secondary/80 border border-cyber-border hover:border-brand-vibrant-indigo/50 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1 relative overflow-hidden shadow-sm"
                                     >
                                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                             <Calendar className="w-32 h-32 rotate-12" />
@@ -518,10 +524,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
 
                                         <div className="flex justify-between items-start mb-4 relative z-10">
                                             <div>
-                                                <h3 className="text-2xl font-bold text-white mb-1">
+                                                <h3 className="text-2xl font-bold text-text-primary mb-1">
                                                     {booking.room_details?.room_number}
                                                 </h3>
-                                                <span className="text-xs font-medium text-gray-400 px-2 py-1 bg-gray-800 rounded-full border border-gray-700">
+                                                <span className="text-xs font-bold text-[var(--accent-indigo)] px-3 py-1 bg-[var(--accent-indigo)]/10 rounded-full border border-[var(--accent-indigo)]/20 uppercase tracking-tighter">
                                                     {booking.room_details?.block}
                                                 </span>
                                             </div>
@@ -540,26 +546,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                                         </div>
 
                                         <div className="space-y-3 relative z-10">
-                                            <div className="flex items-center gap-3 text-gray-300">
-                                                <Calendar className="w-4 h-4 text-indigo-400" />
+                                            <div className="flex items-center gap-3 text-text-secondary">
+                                                <Calendar className="w-4 h-4 text-brand-accent" />
                                                 <span className="font-medium">
                                                     {new Date(booking.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3 text-gray-300">
-                                                <Clock className="w-4 h-4 text-indigo-400" />
-                                                <span className="font-medium bg-indigo-500/10 px-2 py-0.5 rounded text-indigo-300">
+                                            <div className="flex items-center gap-3 text-text-secondary">
+                                                <Clock className="w-4 h-4 text-brand-accent" />
+                                                <span className="font-bold bg-indigo-500/10 px-2 py-0.5 rounded text-indigo-600">
                                                     {booking.start_time.slice(0, 5)} - {booking.end_time.slice(0, 5)}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3 text-gray-300">
-                                                <User className="w-4 h-4 text-indigo-400" />
+                                            <div className="flex items-center gap-3 text-text-secondary">
+                                                <User className="w-4 h-4 text-brand-accent" />
                                                 <span className="truncate">{booking.user_name}</span>
                                             </div>
                                         </div>
 
-                                        <div className="mt-6 pt-4 border-t border-gray-600/50 relative z-10">
-                                            <p className="text-sm text-gray-400 line-clamp-2 italic">
+                                        <div className="mt-6 pt-4 border-t border-cyber-border relative z-10">
+                                            <p className="text-sm text-text-secondary line-clamp-2 italic">
                                                 "{booking.purpose}"
                                             </p>
                                         </div>
@@ -567,9 +573,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                                 ))}
 
                                 {getFilteredBookings().length === 0 && (
-                                    <div className="col-span-full flex flex-col items-center justify-center p-12 text-gray-500 border-2 border-dashed border-gray-700 rounded-2xl">
-                                        <Calendar className="w-12 h-12 mb-4 opacity-50" />
-                                        <p className="text-lg font-medium">No {bookingFilter} bookings found</p>
+                                    <div className="col-span-full flex flex-col items-center justify-center p-12 text-[var(--text-tertiary)] border-2 border-dashed border-[var(--border)] rounded-2xl">
+                                        <Calendar className="w-12 h-12 mb-4 opacity-50 text-[var(--accent-indigo)]" />
+                                        <p className="text-xl font-bold">No {bookingFilter} bookings found</p>
                                     </div>
                                 )}
                             </div>
@@ -583,18 +589,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                         // ... (existing blocks table)
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
-                                <thead className="bg-gray-900/50 border-b border-gray-700 text-xs uppercase text-gray-400 font-semibold">
+                                <thead className="bg-[var(--bg-secondary)] border-b border-[var(--border)] text-xs uppercase text-[var(--text-tertiary)] font-bold tracking-wider">
                                     <tr>
                                         <th className="px-6 py-4">Block ID</th>
                                         <th className="px-6 py-4">Block Name</th>
                                         <th className="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-700">
+                                <tbody className="divide-y divide-[var(--border)]">
                                     {blocks.map((block) => (
-                                        <tr key={block.id} className="hover:bg-gray-700/20 transition-colors">
-                                            <td className="px-6 py-4 text-gray-500">#{block.id}</td>
-                                            <td className="px-6 py-4 font-medium text-white">{block.name}</td>
+                                        <tr key={block.id} className="hover:bg-[var(--bg-secondary)] transition-colors border-b border-[var(--border)]">
+                                            <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">#{block.id}</td>
+                                            <td className="px-6 py-4 text-[var(--text-primary)] font-semibold">{block.name}</td>
                                             <td className="px-6 py-4 text-right">
                                                 <button
                                                     onClick={() => handleDeleteBlock(block.id)}
@@ -608,7 +614,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                                     ))}
                                     {blocks.length === 0 && (
                                         <tr>
-                                            <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                                            <td colSpan={3} className="px-6 py-12 text-center text-[var(--text-tertiary)]">
                                                 No blocks found.
                                             </td>
                                         </tr>
@@ -624,7 +630,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                         <div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
-                                    <thead className="bg-gray-900/50 border-b border-gray-700 text-xs uppercase text-gray-400 font-semibold">
+                                    <thead className="bg-[var(--bg-secondary)] border-b border-[var(--border)] text-xs uppercase text-[var(--text-tertiary)] font-bold tracking-wider">
                                         <tr>
                                             <th className="px-6 py-4">Room Number</th>
                                             <th className="px-6 py-4">Type</th>
@@ -634,13 +640,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                                             <th className="px-6 py-4">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-700">
+                                    <tbody className="divide-y divide-[var(--border)]">
                                         {rooms.map((room) => (
-                                            <tr key={room.id} className="hover:bg-gray-700/20 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-white">{room.room_number}</td>
-                                                <td className="px-6 py-4 text-gray-300">{room.room_type}</td>
-                                                <td className="px-6 py-4 text-gray-300">{room.block}</td>
-                                                <td className="px-6 py-4 text-gray-300">{room.capacity} Seats</td>
+                                            <tr key={room.id} className="hover:bg-[var(--bg-secondary)] transition-colors">
+                                                <td className="px-6 py-4 font-bold text-[var(--text-primary)]">{room.room_number}</td>
+                                                <td className="px-6 py-4 text-[var(--text-secondary)]">{room.room_type}</td>
+                                                <td className="px-6 py-4 text-[var(--text-secondary)]">{room.block}</td>
+                                                <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">{room.capacity} Seats</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${room.is_active ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'
                                                         }`}>
@@ -678,24 +684,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
 
             {/* Block Modal */}
             {showBlockModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full border border-gray-700 shadow-2xl">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold text-white">Add New Block</h3>
-                            <button onClick={() => setShowBlockModal(false)} className="text-gray-400 hover:text-white">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center modal z-50 p-4">
+                    <div className="bg-[var(--surface)] rounded-2xl p-8 max-w-md w-full border border-[var(--border)] shadow-2xl animate-scale-in">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-2xl font-bold text-[var(--text-primary)]">Add New Block</h3>
+                            <button onClick={() => setShowBlockModal(false)} className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
                         <form onSubmit={handleCreateBlock} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Block Name</label>
+                                <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Block Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={newBlockName}
                                     onChange={(e) => setNewBlockName(e.target.value)}
                                     placeholder="e.g. M-Block"
-                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-[var(--text-tertiary)]"
                                 />
                             </div>
                             <div className="pt-4">
@@ -710,43 +716,43 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
 
             {/* Room Modal */}
             {showRoomModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full border border-gray-700 shadow-2xl">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center modal p-4">
+                    <div className="bg-[var(--surface)] rounded-2xl p-6 max-w-md w-full border border-[var(--border)] shadow-2xl">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold text-white">{editingRoom ? 'Edit Room' : 'Add New Room'}</h3>
-                            <button onClick={() => setShowRoomModal(false)} className="text-gray-400 hover:text-white">
+                            <h3 className="text-xl font-bold text-[var(--text-primary)]">{editingRoom ? 'Edit Room' : 'Add New Room'}</h3>
+                            <button onClick={() => setShowRoomModal(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
                         <form onSubmit={handleSaveRoom} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Room Number</label>
+                                <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Room Number</label>
                                 <input
                                     type="text"
                                     required
                                     value={roomForm.room_number}
                                     onChange={(e) => setRoomForm({ ...roomForm, room_number: e.target.value })}
-                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">Capacity</label>
+                                    <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Capacity</label>
                                     <input
                                         type="number"
                                         required
                                         value={roomForm.capacity}
                                         onChange={(e) => setRoomForm({ ...roomForm, capacity: parseInt(e.target.value) })}
-                                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">Block</label>
+                                    <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Block</label>
                                     <select
                                         value={roomForm.block}
                                         onChange={(e) => setRoomForm({ ...roomForm, block: e.target.value })}
                                         required
-                                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 outline-none appearance-none"
+                                        className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all appearance-none"
                                     >
                                         <option value="">Select...</option>
                                         {blocks.map(b => (
@@ -756,11 +762,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Type</label>
+                                <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Type</label>
                                 <select
                                     value={roomForm.room_type}
                                     onChange={(e) => setRoomForm({ ...roomForm, room_type: e.target.value })}
-                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 outline-none appearance-none"
+                                    className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all appearance-none"
                                 >
                                     <option value="Lecture Hall">Lecture Hall</option>
                                     <option value="Classroom">Classroom</option>
@@ -769,14 +775,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeView = 'availabil
                                     <option value="Seminar Hall">Seminar Hall</option>
                                 </select>
                             </div>
-                            <div className="flex items-center gap-2 pt-2">
+                            <div className="flex items-center gap-3 pt-2">
                                 <input
                                     type="checkbox"
                                     checked={roomForm.is_active}
                                     onChange={(e) => setRoomForm({ ...roomForm, is_active: e.target.checked })}
-                                    className="w-4 h-4 rounded bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"
+                                    className="w-5 h-5 rounded border-[var(--border)] bg-[var(--bg-secondary)] text-indigo-600 focus:ring-indigo-500 transition-all"
                                 />
-                                <span className="text-sm text-gray-300">Room is Active</span>
+                                <span className="text-sm font-medium text-[var(--text-secondary)]">Room Availability Active</span>
                             </div>
                             <div className="pt-4">
                                 <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors">

@@ -148,3 +148,30 @@ def manage_user_view(request, pk):
             return Response({'message': 'User role updated successfully', 'user': UserSerializer(user).data})
             
         return Response({'error': 'No role provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_profile_view(request):
+    """Update user profile (Name, Password, Avatar)"""
+    user = request.user
+    
+    # Update text fields
+    if 'first_name' in request.data:
+        user.first_name = request.data['first_name']
+    if 'last_name' in request.data:
+        user.last_name = request.data['last_name']
+        
+    # Update password if provided
+    if 'password' in request.data and request.data['password']:
+        user.set_password(request.data['password'])
+        
+    # Update avatar if provided
+    if 'avatar' in request.FILES:
+        user.avatar = request.FILES['avatar']
+        
+    user.save()
+    
+    return Response({
+        'message': 'Profile updated successfully',
+        'user': UserSerializer(user, context={'request': request}).data
+    })
